@@ -6,32 +6,6 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
-opciones_autor = [
-    [0, "Admin"],
-    [1, "Staff"],
-]
-
-opciones_categoria = [
-    [0, "Alimentacion"],
-    [1, "Medicamentos"],
-    [2, "Agenda Medica"],
-    [3, "Fonoaudiologia"],
-]
-
-class Publicacion(models.Model):
-    id_publicacion = models.AutoField(primary_key=True)
-    titulo = models.CharField(max_length=50)
-    fecha_publicacion = models.DateField()
-    categoria = models.IntegerField(choices=opciones_categoria)
-    autor = models.IntegerField(choices=opciones_autor)
-    texto = models.TextField()
-    imagen = models.ImageField(upload_to="publicacion", null=True)
-    class Meta:
-        verbose_name = "Publicacion"
-        verbose_name_plural = "Publicaciones"
-
-    def __int__(self) :
-        return self.id_publicacion
 
 class Tipo_Usuario(models.Model):
     id = models.AutoField(primary_key=True)
@@ -71,7 +45,7 @@ class Profesional(models.Model):
         verbose_name_plural = "Profesionales"
 
     def __str__(self):
-        return self.rutprofesional
+        return self.rutprofesional + ' / ' + self.nombreprofesional + ' ' + self.apellidopaternoprofesional
 
 
 class Paciente(models.Model):
@@ -90,13 +64,13 @@ class Paciente(models.Model):
         verbose_name_plural = "Pacientes"
 
     def __str__(self):
-        return self.rutpaciente
+        return self.rutpaciente + ' / ' + self.nombrepaciente + ' ' + self.apellidopatpaciente
 
 
 class Fonoaudiologo_paciente(models.Model):
     id = models.AutoField(primary_key=True)
     id_app_usuario = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name="Id Usuario")
-    idapp_paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Rut Paciente")
+    idapp_paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Rut / Nombre Paciente")
     fecha = models.DateField()
     audio = models.FileField()
     video = models.FileField()
@@ -105,14 +79,14 @@ class Fonoaudiologo_paciente(models.Model):
         verbose_name = "Fonoaudiologo - Paciente"
         verbose_name_plural = "Fonoaudiologo - Paciente"
 
-    def __str__(self):
-        return self.nombrepaciente
+    def __int__(self):
+        return self.id
 
 
 class Paciente_Profesional(models.Model):
     id = models.AutoField(primary_key=True)
-    idapp_paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Rut Paciente")
-    idapp_profesional = models.ForeignKey(Profesional, on_delete=models.PROTECT, verbose_name="Rut Profesional")
+    idapp_paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Rut / Nombre Paciente")
+    idapp_profesional = models.ForeignKey(Profesional, on_delete=models.PROTECT, verbose_name="Rut / Nombre Profesional")
     id_tipo_usuario= models.ForeignKey(Tipo_Usuario, on_delete=models.PROTECT, verbose_name="Tipo usuario Profesional")
     class Meta:
         verbose_name = "Paciente - Profesional"
@@ -125,7 +99,7 @@ class Paciente_Profesional(models.Model):
 class Enfermeria_paciente(models.Model):
     id = models.AutoField(primary_key=True)
     id_app_usuario = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name="Id Usuario")
-    idapp_paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Rut Paciente")
+    idapp_paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Rut / Nombre Paciente")
     fecha_contactabilidad = models.DateField()
     bitacora_contactabilidad = models.TextField()
     class Meta:
@@ -153,11 +127,52 @@ class Medicamento(models.Model):
 class MedicamentoCompra(models.Model):
     id = models.AutoField(primary_key=True)
     id_app_usuario = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name="Id Usuario")
-    idapp_paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Rut Paciente")
+    idapp_paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Rut / Nombre Paciente")
     idapp_medicamento = models.ForeignKey(Medicamento, on_delete=models.PROTECT, verbose_name="Medicamento/Laboratorio/Dosis/Cant.Display")
     fecha_compra = models.DateField()
 
     def __int__(self):
         return self.id
 
-    
+
+class Neurologia_Paciente(models.Model):
+    id = models.AutoField(primary_key=True)
+    id_app_usuario = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name="Id Usuario")
+    idapp_paciente = models.ForeignKey(Paciente, on_delete=models.PROTECT, verbose_name="Rut / Nombre Paciente")
+    fecha_consulta = models.DateField(verbose_name="Fecha consulta")
+    comentario = models.TextField(verbose_name="Comentarios Consulta")
+    idapp_medicamento = models.ForeignKey(Medicamento, on_delete=models.PROTECT, verbose_name="Medicamento recomendado")
+    class Meta:
+        verbose_name = "Neurologia - Paciente"
+        verbose_name_plural = "Neurologia - Pacientes"
+
+    def __int__(self):
+        return self.id
+
+
+class CategoriaPublicacion(models.Model):
+    id = models.AutoField(primary_key=True)
+    nombrecategoria = models.CharField(max_length=30, verbose_name="Nombre Categoria")
+    descripcion = models.TextField()
+    class Meta:
+        verbose_name = "Categoria Publicacion"
+        verbose_name_plural = "Categoria Publicaciones"
+
+    def __str__(self):
+        return self.nombrecategoria
+
+
+class Publicacion(models.Model):
+    id_publicacion = models.AutoField(primary_key=True)
+    titulo = models.CharField(max_length=50)
+    fecha_publicacion = models.DateField()
+    categoria = models.ForeignKey(CategoriaPublicacion, on_delete=models.PROTECT)
+    autor = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name="Autor")
+    texto = models.TextField()
+    imagen = models.ImageField(upload_to="publicacion", null=True)
+    class Meta:
+        verbose_name = "Publicacion"
+        verbose_name_plural = "Publicaciones"
+
+    def __int__(self) :
+        return self.id_publicacion
