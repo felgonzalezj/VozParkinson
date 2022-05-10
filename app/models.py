@@ -1,8 +1,10 @@
 import email
 from statistics import mode
 from tabnanny import verbose
+import django
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.admin.models import *
 
 # Create your models here.
 
@@ -162,6 +164,12 @@ class CategoriaPublicacion(models.Model):
         return self.nombrecategoria
 
 
+opciones_estado = [
+    [0, "En espera"],
+    [1, "Visible"],
+]
+
+
 class Publicacion(models.Model):
     id_publicacion = models.AutoField(primary_key=True)
     titulo = models.CharField(max_length=50)
@@ -170,6 +178,7 @@ class Publicacion(models.Model):
     autor = models.ForeignKey(User, on_delete=models.PROTECT, verbose_name="Autor")
     texto = models.TextField()
     imagen = models.ImageField(upload_to="publicacion", null=True)
+    estado = models.IntegerField(choices=opciones_estado)
     class Meta:
         verbose_name = "Publicacion"
         verbose_name_plural = "Publicaciones"

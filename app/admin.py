@@ -5,6 +5,8 @@ from django.contrib.auth.admin import UserAdmin
 
 # Register your models here.
 
+admin.site.site_header = 'Administración Voz Parkinson'
+
 class AccountInline(admin.StackedInline):
     model = Account
     can_delete = False
@@ -20,7 +22,7 @@ class ProfesionalAdmin(admin.ModelAdmin):
     list_display = ["id", "id_app_usuario", "id_tipo_usuario", "rutprofesional", "nombreprofesional","apellidopaternoprofesional", "email","telefono","whatsapp", "telegram"]
 
 class PublicacionAdmin(admin.ModelAdmin):
-    list_display = ["id_publicacion", "titulo", "fecha_publicacion", "categoria", "autor", "texto", "imagen"]
+    list_display = ["id_publicacion", "titulo", "fecha_publicacion", "categoria", "autor", "texto", "imagen", "estado"]
 
 class FonoPacienteAdmin(admin.ModelAdmin):
     list_display = ["id_app_usuario", "idapp_paciente",   "fecha", "audio", "video","feedback"]
