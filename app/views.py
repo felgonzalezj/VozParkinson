@@ -1,5 +1,7 @@
+from contextvars import Context, ContextVar
+from multiprocessing import context
 from django.shortcuts import render
-from .models import Medicamento, MedicamentoCompra, Paciente, Publicacion
+from .models import Medicamento, MedicamentoCompra, Paciente, Publicacion, Fonoaudiologo_paciente
 from rest_framework import viewsets
 from .serializers import PacienteSerializer, MedicamentoSerializer, MedCompSerializer
 
@@ -35,3 +37,11 @@ def contacto(request):
 
 def nosotros(request):
     return render(request, 'app/nosotros.html')
+
+def pacientes(request):
+    fonopacientes = Fonoaudiologo_paciente.objects.all()
+    data = {
+        'FonoPacientes' : fonopacientes
+    }
+    return render(request, 'app/pacientes.html', data)
+

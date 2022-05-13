@@ -54,6 +54,9 @@
 							{% if user.is_staff %}
 							<li><a href="/admin">Ir al Admin</a></li>
 							{% endif %}
+							{% if user.is_authenticated %}
+							<li><a href="{% url 'pacientes' %}">Mis Pacientes</a></li>
+							{% endif %}
 							{% if user.is_staff %}
 							<li><a href="/21292120194393482">Ir a la Api</a></li>
 							{% endif %}
